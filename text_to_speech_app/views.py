@@ -1,12 +1,13 @@
 import os
 import shutil
-
-from gtts import gTTS
+import requests
 from django.shortcuts import render, redirect
 
 NUM_AUDIO = 5
 audio_files_prompt_list = []
 prompt_dict = dict(zip([f"output{i}.mp3" for i in range(1, NUM_AUDIO+1)], [''] * NUM_AUDIO))
+generator_docker_container_ip = '172.17.0.2'
+generator_docker_container_port = '8080'
 
 
 # Function that counts audio files in directory
@@ -20,10 +21,23 @@ def count_audio(directory):
 
 
 # Function that generates audio from prompt and saves it as output1.mp3
+#def generate_audio(prompt, audio_directory):
+#    tts = gTTS(text=prompt, lang='en', slow=False)
+#    audio_file_path = os.path.join(audio_directory, "output1.mp3")
+#    tts.save(audio_file_path)
+
+# Function that send request to audio generator container which generates audio from prompt and saves it in audio_directory as output1.mp3
 def generate_audio(prompt, audio_directory):
-    tts = gTTS(text=prompt, lang='en', slow=False)
-    audio_file_path = os.path.join(audio_directory, "output1.mp3")
-    tts.save(audio_file_path)
+    get_response_to_url = f'http://{generator_docker_container_ip}:{generator_docker_container_port}/generate?prompt={prompt}'
+    response = requests.get(get_response_to_url)
+
+    filename = 'output.mp3'
+    response = requests.get(f'http://{generator_docker_container_ip}:{generator_docker_container_port}/audio/{filename}')
+
+    if response.status_code == 200:
+        audio_file_path = os.path.join(audio_directory, "output1.mp3")
+        with open(audio_file_path, 'wb') as audio:
+            audio.write(response.content)
 
 
 def text_to_speech(request):
