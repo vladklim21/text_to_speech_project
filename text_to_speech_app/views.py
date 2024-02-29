@@ -3,9 +3,10 @@ import shutil
 import requests
 from django.shortcuts import render, redirect
 
+AUDIO_TYPE = 'wav'
 NUM_AUDIO = 5
 audio_files_prompt_list = []
-prompt_dict = dict(zip([f"output{i}.mp3" for i in range(1, NUM_AUDIO+1)], [''] * NUM_AUDIO))
+prompt_dict = dict(zip([f"output{i}.{AUDIO_TYPE}" for i in range(1, NUM_AUDIO+1)], [''] * NUM_AUDIO))
 generator_docker_container_ip = '172.17.0.2'
 generator_docker_container_port = '8080'
 
@@ -13,7 +14,7 @@ generator_docker_container_port = '8080'
 # Function that counts audio files in directory
 def count_audio(directory):
     audio_count = 0
-    audio_extensions = ['.mp3']
+    audio_extensions = [f'.{AUDIO_TYPE}']
     for filename in os.listdir(directory):
         if any(filename.lower().endswith(ext) for ext in audio_extensions):
             audio_count += 1
@@ -31,11 +32,11 @@ def generate_audio(prompt, audio_directory):
     get_response_to_url = f'http://{generator_docker_container_ip}:{generator_docker_container_port}/generate?prompt={prompt}'
     response = requests.get(get_response_to_url)
 
-    filename = 'output.mp3'
+    filename = f'output.{AUDIO_TYPE}'
     response = requests.get(f'http://{generator_docker_container_ip}:{generator_docker_container_port}/audio/{filename}')
 
     if response.status_code == 200:
-        audio_file_path = os.path.join(audio_directory, "output1.mp3")
+        audio_file_path = os.path.join(audio_directory, f"output1.{AUDIO_TYPE}")
         with open(audio_file_path, 'wb') as audio:
             audio.write(response.content)
 
@@ -62,7 +63,7 @@ def text_to_speech(request):
             # Saving first output
             if audio_count == 0:
                 generate_audio(prompt, audio_directory)
-                prompt_dict['output1.mp3'] = prompt
+                prompt_dict[f'output1.{AUDIO_TYPE}'] = prompt
 
             # Saving outputs until NUM_AUDIO
             elif 0 < audio_count < NUM_AUDIO:
@@ -70,12 +71,12 @@ def text_to_speech(request):
 
                 for filename in sorted(list_of_audio, reverse=True):
                     num = int(filename[6])
-                    os.rename(f'{audio_directory}/{filename}', f'{audio_directory}/output{num+1}.mp3')
+                    os.rename(f'{audio_directory}/{filename}', f'{audio_directory}/output{num+1}.{AUDIO_TYPE}')
                     # Collecting prompt dict
-                    prompt_dict[f'output{num + 1}.mp3'] = prompt_dict[filename]
+                    prompt_dict[f'output{num + 1}.{AUDIO_TYPE}'] = prompt_dict[filename]
 
                 generate_audio(prompt, audio_directory)
-                prompt_dict['output1.mp3'] = prompt
+                prompt_dict[f'output1.{AUDIO_TYPE}'] = prompt
 
             # Saving outputs after reaching NUM_AUDIO with deleting last element
             elif audio_count >= NUM_AUDIO:
@@ -83,22 +84,22 @@ def text_to_speech(request):
 
                 for filename in sorted(list_of_audio, reverse=True):
                     num = int(filename[6])
-                    os.rename(f'{audio_directory}/{filename}', f'{audio_directory}/output{num + 1}.mp3')
+                    os.rename(f'{audio_directory}/{filename}', f'{audio_directory}/output{num + 1}.{AUDIO_TYPE}')
                     # Collecting prompt dict
-                    prompt_dict[f'output{num + 1}.mp3'] = prompt_dict[filename]
+                    prompt_dict[f'output{num + 1}.{AUDIO_TYPE}'] = prompt_dict[filename]
 
                 generate_audio(prompt, audio_directory)
-                prompt_dict['output1.mp3'] = prompt
+                prompt_dict[f'output1.{AUDIO_TYPE}'] = prompt
 
                 # WRITE A CODE TO REMOVE ALL FILES AFTER NUM_AUDIO
-                os.remove(f'{audio_directory}/output{NUM_AUDIO + 1}.mp3')
-                del prompt_dict[f'output{NUM_AUDIO + 1}.mp3']
+                os.remove(f'{audio_directory}/output{NUM_AUDIO + 1}.{AUDIO_TYPE}')
+                del prompt_dict[f'output{NUM_AUDIO + 1}.{AUDIO_TYPE}']
 
         audio_count = count_audio(audio_directory)
 
         # Creating a list of pairs audio_directory and prompt for sending it to HTML page
         if audio_count > 0:
-            audio_files_prompt_list = [[f"{audio_directory}/output{i}.mp3", prompt_dict[f'output{i}.mp3']] for i in range(1, audio_count + 1)]
+            audio_files_prompt_list = [[f"{audio_directory}/output{i}.{AUDIO_TYPE}", prompt_dict[f'output{i}.{AUDIO_TYPE}']] for i in range(1, audio_count + 1)]
 
     return render(request, 'text_to_speech.html', {'audio_files_prompt': audio_files_prompt_list})
 
