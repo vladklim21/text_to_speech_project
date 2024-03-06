@@ -8,6 +8,7 @@ AUDIO_TYPE = 'mp3'
 
 NUM_AUDIO = 5
 
+# IP and port of container which generates audio
 generator_docker_container_ip = 'localhost'
 generator_docker_container_port = '8080'
 
@@ -26,13 +27,7 @@ def count_audio(directory):
     return audio_count
 
 
-# Function that generates audio from prompt and saves it as output1.mp3
-#def generate_audio(prompt, audio_directory):
-#    tts = gTTS(text=prompt, lang='en', slow=False)
-#    audio_file_path = os.path.join(audio_directory, "output1.mp3")
-#    tts.save(audio_file_path)
-
-# Function that send request to audio generator container which generates audio from prompt and saves it in audio_directory as output1.mp3
+# Function that sends request to audio generator container which generates audio from prompt and saves it in audio_directory as output1.mp3
 def generate_audio(prompt, audio_directory):
     get_response_to_url = f'http://{generator_docker_container_ip}:{generator_docker_container_port}/generate?prompt={prompt}'
     response = requests.get(get_response_to_url)
