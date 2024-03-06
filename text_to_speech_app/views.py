@@ -3,12 +3,17 @@ import shutil
 import requests
 from django.shortcuts import render, redirect
 
-AUDIO_TYPE = 'wav'
+# Settings
+AUDIO_TYPE = 'mp3'
+
 NUM_AUDIO = 5
+
+generator_docker_container_ip = 'localhost'
+generator_docker_container_port = '8080'
+
+# Making lists and dictionaries to store audio and prompts
 audio_files_prompt_list = []
 prompt_dict = dict(zip([f"output{i}.{AUDIO_TYPE}" for i in range(1, NUM_AUDIO+1)], [''] * NUM_AUDIO))
-generator_docker_container_ip = '172.17.0.2'
-generator_docker_container_port = '8080'
 
 
 # Function that counts audio files in directory
