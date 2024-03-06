@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 
 # Settings
 AUDIO_TYPE = 'mp3'
-
 NUM_AUDIO = 5
 
 # IP and port of container which generates audio
