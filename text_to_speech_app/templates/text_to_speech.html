@@ -12,12 +12,13 @@
 <body style="background-color: #1f1835;">
 
     <div class="container" >
-
+        <p></p>
         <!-- LOGO -->
         <div class="text-center">
-            <img src="{% static "text_to_speech_app/img/logo.jpg" %}" class="rounded" style="width: 300px; height: 200px;" >
+            <img src="{% static "text_to_speech_app/img/logo.jpeg" %}" class="rounded" style="width: 400px; height: 160px;" >
         </div>
 
+        <p></p>
         <p></p>
 
         <!-- Textbox for prompt and generate button -->
@@ -26,7 +27,7 @@
 
                 <!-- Textbox for prompt -->
                 <div class="input-group input-group-lg">
-                    <span class="input-group-text" id="inputGroup-sizing-lg">Your Prompt:</span>
+                    <span class="input-group-text" id="inputGroup-sizing-lg" style="background-color: #E4D0F3;">Your Prompt:</span>
                     <input type="text" name="prompt" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
                 </div>
 
@@ -41,17 +42,18 @@
         </form>
 
 
-        <div class="mx-auto p-2" style="width: 400px;">
+        <div class="mx-auto p-2" style="width: 400px;" >
         <!-- Audio Players with prompt  -->
         {% if audio_files_prompt %}
         {% for audio_file in audio_files_prompt %}
 
-            <div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
-            <div class="mx-auto p-2" style="width: 400px;">
+            <div class="shadow-lg p-3 mb-5 rounded" style="background-color: #33284B;">
+
+                <div class="mx-auto p-2" style="">
                 <!-- Prompt  -->
-                <p>{{ audio_file.1 }}:</p>
+                <p class="text-white">{{ audio_file.1 }}:</p>
                 <p></p>
-            </div>
+                </div>
 
                 <!-- Audio Player  -->
                 <audio controls>
@@ -59,6 +61,7 @@
                     Your browser does not support the audio element.
                 </audio>
                 <p></p>
+
             </div>
 
         {% endfor %}
@@ -72,6 +75,40 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Clear</button>
         </form>
+        </div>
+
+
+
+
+
+        <!-- Button trigger modal -->
+        <div class="fixed-bottom">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal" >
+          How it works?
+        </button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">How to use Ai Sound Generator</h1>
+
+              </div>
+              <div class="modal-body">
+                  <p>1. Write a prompt in a text field</p>
+                  <p>2. Press "Generate" button</p>
+                  <p>3. Wait 20 seconds while our AI generates unique sound for you</p>
+                  <p>4. Play or Download the sound using player</p>
+                  <p>5. Press "Clear" button to clear field of sounds</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #33284B;">Close</button>
+
+              </div>
+            </div>
+          </div>
         </div>
 
 
