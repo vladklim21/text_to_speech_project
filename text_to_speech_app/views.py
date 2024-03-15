@@ -108,3 +108,4 @@ def delete_audio_directory(request):
     if os.path.exists(audio_directory):
         shutil.rmtree(audio_directory)
     return redirect('text_to_speech')
+    #return render('text_to_speech.html')
